@@ -112,6 +112,7 @@ execute_process(COMMAND ${MPIEXEC} --version
 if (mpi_version_out MATCHES "[Oo]pen[ -][Mm][Pp][Ii]")
   message( STATUS "OpenMPI detected")
   set ( openmpi true PARENT_SCOPE)
+  set ( openmpi true )
   # Write out a host file because OMPI's mpiexec is dumb
   file(WRITE ${CMAKE_BINARY_DIR}/hostfile "${HOST_NAME} slots=${N_CPU}\n")
 endif ()
@@ -307,7 +308,11 @@ configure_file("${CMAKE_SOURCE_DIR}/src/extensions/caf.in" "${CMAKE_BINARY_DIR}/
 #
 
 if(CAF_ENABLE_FAILED_IMAGES)
-  set(HAVE_FAILED_IMG "true")
+  if (openmpi) # in cafrun, distinguish mpiexec arguments to enable/disable failed images
+    set(HAVE_FAILED_IMG "ulfm2")
+  else()
+    set(HAVE_FAILED_IMG "mpich")
+  endif()
 else()
   set(HAVE_FAILED_IMG "false")
 endif()
